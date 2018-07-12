@@ -1,5 +1,7 @@
 # install
 
+Go言語初めてだったのでインストール作業から。
+
 ## Mac
 
     $ brew install go
