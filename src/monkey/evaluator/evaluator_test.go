@@ -31,6 +31,7 @@ func TestEvalIntegerExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
+		t.Log(tt.input)
 		testIntegerObject(t, evaluated, tt.expected)
 	}
 }
@@ -87,6 +88,7 @@ func TestEvalBooleanExpression(t *testing.T) {
 
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
+		t.Log(tt.input)
 		testBooleanObject(t, evaluated, tt.expected)
 	}
 }
@@ -145,6 +147,8 @@ func TestIfElseExpressions(t *testing.T) {
 		integer, ok := tt.expected.(int)
 
 		if ok {
+			t.Logf("%d", integer)
+			t.Log(tt.input)
 			testIntegerObject(t, evaluated, int64(integer))
 		} else {
 			testNullObject(t, evaluated)
@@ -159,4 +163,33 @@ func testNullObject(t *testing.T, obj object.Object) bool {
 	}
 
 	return true
+}
+
+func TestReturnStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"return 10;", 10},
+		{"return 10; 9;", 10},
+		{"return 2 * 5; 9;", 10},
+		{"9; return 2 * 5; 9;", 10},
+		/*
+				{`
+		if (10 > 1) {
+			if (10 > 1) {
+				return 10;
+			}
+			return 1;
+		}
+		`,
+					10,
+				},
+		*/
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testIntegerObject(t, evaluated, tt.expected)
+	}
 }
