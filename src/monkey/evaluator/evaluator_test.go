@@ -140,6 +140,17 @@ func TestIfElseExpressions(t *testing.T) {
 		{"if (1 > 2) { 10 }", nil},
 		{"if (1 > 2) { 10 } else { 20 }", 20},
 		{"if (1 < 2) { 10 } else { 20 }", 10},
+		{
+			`
+if (10 > 1) {
+	if (10 > 1) {
+		return 10;
+	}
+	return 1;
+}
+`,
+			10,
+		},
 	}
 
 	for _, tt := range tests {
@@ -147,8 +158,12 @@ func TestIfElseExpressions(t *testing.T) {
 		integer, ok := tt.expected.(int)
 
 		if ok {
-			t.Logf("%d", integer)
-			t.Log(tt.input)
+			/*
+				t.Logf("%d", integer)
+				t.Logf("%T", evaluated)
+				t.Logf("%+v", evaluated)
+				t.Log(tt.input)
+			*/
 			testIntegerObject(t, evaluated, int64(integer))
 		} else {
 			testNullObject(t, evaluated)
@@ -175,16 +190,16 @@ func TestReturnStatements(t *testing.T) {
 		{"return 2 * 5; 9;", 10},
 		{"9; return 2 * 5; 9;", 10},
 		/*
-				{`
-		if (10 > 1) {
+					{`
 			if (10 > 1) {
-				return 10;
+				if (10 > 1) {
+					return 10;
+				}
+				return 1;
 			}
-			return 1;
-		}
-		`,
-					10,
-				},
+			`,
+						10,
+					},
 		*/
 	}
 

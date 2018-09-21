@@ -14,30 +14,38 @@ var (
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		//return evalProgram(node)
-		return evalStatements(node.Statements)
+		//fmt.Printf("Program\n")
+		return evalProgram(node)
 	case *ast.BlockStatement:
+		//fmt.Printf("BlockStatement\n")
 		return evalBlockStatement(node)
-		return evalStatements(node.Statements)
 	case *ast.ExpressionStatement:
+		//fmt.Printf("ExpressionStatement\n")
 		return Eval(node.Expression)
 	case *ast.PrefixExpression:
+		//fmt.Printf("PrefixExpression\n")
 		right := Eval(node.Right)
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue)
+		//fmt.Printf("ReturnStatement: %d\n", val)
 		return &object.ReturnValue{Value: val}
 	case *ast.InfixExpression:
+		//fmt.Printf("InfixExpression\n")
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
 	case *ast.IfExpression:
+		//fmt.Printf("IfExpression\n")
 		return evalIfExpression(node)
 	case *ast.IntegerLiteral:
+		//fmt.Printf("IntegerLiteral: %d\n", node.Value)
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
+		//fmt.Printf("Boolean: %t\n", node.Value)
 		return nativeBoolToBooleanObject(node.Value)
 	}
+	//fmt.Println("Eval: nil Error")
 	return nil
 }
 
@@ -45,7 +53,7 @@ func evalProgram(program *ast.Program) object.Object {
 	var result object.Object
 
 	for _, statement := range program.Statements {
-		result := Eval(statement)
+		result = Eval(statement)
 
 		if returnValue, ok := result.(*object.ReturnValue); ok {
 			return returnValue.Value
@@ -57,15 +65,21 @@ func evalProgram(program *ast.Program) object.Object {
 
 func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	var result object.Object
+	/*
+		//fmt.Printf("evalBlockStatement: %+v\n", block)
+		//fmt.Printf("evalBlockStatement: %+v\n", block.Statements)
+	*/
 
 	for _, statement := range block.Statements {
-		result := Eval(statement)
+		result = Eval(statement)
 
+		////fmt.Printf("inloop: evalBlockStatement: %+v\n", result)
 		if result != nil && result.Type() == object.RETURN_VALUE_OBJ {
 			return result
 		}
 	}
 
+	////fmt.Printf("evalBlockStatement: %+v\n", result)
 	return result
 }
 
@@ -125,14 +139,17 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
+	//fmt.Println("evalInfixExpression")
 	switch {
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
+		//fmt.Println("Eval: evalIntegerInfixExpression")
 		return evalIntegerInfixExpression(operator, left, right)
 	case operator == "==":
 		return nativeBoolToBooleanObject(left == right)
 	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
 	default:
+		//fmt.Println("NULL")
 		return NULL
 	}
 }
@@ -159,6 +176,7 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	case "!=":
 		return nativeBoolToBooleanObject(leftVal != rightVal)
 	default:
+		//fmt.Println("Eval: evalIntegerInfixExpression NULL")
 		return NULL
 	}
 }
@@ -171,6 +189,7 @@ func evalIfExpression(ie *ast.IfExpression) object.Object {
 	} else if ie.Alternative != nil {
 		return Eval(ie.Alternative)
 	} else {
+		//fmt.Printf("evalIfExpression: %+v\n", condition)
 		return NULL
 	}
 }
