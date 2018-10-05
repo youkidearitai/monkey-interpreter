@@ -44,6 +44,8 @@ const (
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
 
+	STRING = "STRING"
+
 	EQ     = "EQ"
 	NOT_EQ = "NOT_EQ"
 )
