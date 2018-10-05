@@ -380,3 +380,21 @@ func TestStringConcatenanion(t *testing.T) {
 		t.Errorf("String has wrong value. got=%q", str.Value)
 	}
 }
+
+func TestStringCompare(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{`"Hello" == "World"`, false},
+		{`"Hello" == "Hello"`, true},
+		{`let x = "Hello"; x == "Hello";`, true},
+		{`let x = "Hello"; x == "World";`, false},
+		{`let x = "Hello"; let y = "Hello"; x == y;`, true},
+		{`let x = "Hello"; let y = "World"; x == y;`, false},
+	}
+
+	for _, tt := range tests {
+		testBooleanObject(t, testEval(tt.input), tt.expected)
+	}
+}
